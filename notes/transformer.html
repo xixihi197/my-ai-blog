@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>从零理解Transformer · 研习录</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <main>
+        <nav class="site-nav" aria-label="主导航">
+            <a href="../index.html">首页</a> · <a href="#">笔记</a> · <a href="#">关于</a>
+        </nav>
+
+        <article class="note-full">
+            <h1>从零理解Transformer</h1>
+            <time class="meta" datetime="2026-07-15">2026-07-15</time>
+
+            <p>想象一下你在读一句话，眼睛会不自觉地停留在几个关键词上，而对其余词只是一扫而过。注意力机制（Attention）做的就是这么一件事：它让模型在处理一段文字时，能够自动判断哪些词更重要、哪些词之间关系更紧密，而不是一视同仁地把所有词都当作同等重要的信息。</p>
+
+            <p>在 Transformer 出现之前，模型通常是一个词一个词按顺序读句子，像排队一样，后面的词必须等前面的词处理完才能轮到。Transformer 里的"自注意力"（Self-Attention）则更像是一张网：它一次性把整句话铺开来，让模型同时看到所有词，并自己决定"我"应该和哪些词建立联系。比如看到"它"的时候，模型会自动把注意力回退到前文的某个名词上。</p>
+
+            <p>具体计算时，自注意力会给每个词生成三把"钥匙"：Query、Key 和 Value。初学者大可不必纠结这些名字，可以把它们理解成一种"找相关、加权求和"的过程：先算算每个词和其他词的关联度，再按关联度高低给它们分配权重，最后把这些信息汇总起来。关联度高的词贡献大，关联度低的词贡献小——这就是注意力机制最朴素的直觉。</p>
+        </article>
+
+        <hr>
+
+        <p><a href="../index.html">返回首页</a></p>
+    </main>
+</body>
+</html>

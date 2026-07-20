@@ -1,0 +1,202 @@
+/* 基础重置 */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    min-height: 100vh;
+    background-color: #0d0d0d;
+    /* 暗处的一束微光：从顶部中心向外弥散的径向渐变 */
+    background-image: radial-gradient(ellipse 80% 50% at 50% 0%, #1a1a1a 0%, #0d0d0d 60%);
+    background-attachment: fixed;
+    color: #e8e4dc;
+    font-family: "Noto Serif SC", Georgia, "Songti SC", "STSong", serif;
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+    padding: 10vh 6vw;
+}
+
+/* 页面主体容器：居中、限宽、大量留白 */
+main {
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+/* 顶部导航：等宽、小字、疏朗、低调 */
+.site-nav {
+    font-family: "SFMono-Regular", "Menlo", "Consolas", "Noto Sans SC", monospace;
+    font-size: 0.8125rem;
+    letter-spacing: 0.12em;
+    color: #4a4742;
+    margin-bottom: 3rem;
+}
+
+.site-nav a,
+.site-nav a:visited {
+    color: #7f7a70;
+    border-bottom: none;
+    transition: color 0.25s ease;
+}
+
+.site-nav a:hover,
+.site-nav a:focus {
+    color: #a85e5e;
+}
+
+/* 标题：古典衬线，克制而醒目 */
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Noto Serif SC", Georgia, "Songti SC", "STSong", serif;
+    font-weight: 400;
+    color: #f0ece4;
+    line-height: 1.25;
+}
+
+h1 {
+    font-size: 3.5rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.75rem;
+}
+
+h2 {
+    font-size: 1.875rem;
+    letter-spacing: 0.04em;
+    margin-top: 3.5rem;
+    margin-bottom: 1rem;
+}
+
+h3 {
+    font-size: 1.375rem;
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+}
+
+/* 副标题：比正文更轻，像在暗处低语 */
+.subtitle {
+    font-size: 1.125rem;
+    color: #9e998f;
+    letter-spacing: 0.05em;
+}
+
+/* 正文段落 */
+p {
+    margin-bottom: 1.25rem;
+    max-width: 65ch;
+    color: #c8c3ba;
+}
+
+/* 元信息/等宽字体：日期、分类、标签、代码 */
+.meta,
+time,
+code,
+.tag,
+.data {
+    font-family: "SFMono-Regular", "Menlo", "Consolas", "Noto Sans SC", monospace;
+    font-size: 0.8125rem;
+    color: #7f7a70;
+    letter-spacing: 0.04em;
+}
+
+/* 分隔线：极细，刚好从背景中浮现 */
+hr,
+.divider {
+    border: none;
+    border-top: 1px solid #262626;
+    margin: 4rem 0;
+}
+
+/* 强调与链接：唯一的暗红点缀 */
+a {
+    color: #a85e5e;
+    text-decoration: none;
+    border-bottom: 1px solid #7a3b3b;
+    transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+a:hover,
+a:focus {
+    color: #c98a8a;
+    border-color: #a85e5e;
+}
+
+/* 选中文本的高光：低饱和暗红 */
+::selection {
+    background-color: #7a3b3b;
+    color: #f0ece4;
+}
+
+/* 笔记列表 */
+.note-list {
+    margin-top: 4rem;
+}
+
+.note {
+    padding: 2.5rem 0;
+    transition: background-color 0.25s ease;
+}
+
+/* 笔记之间的分隔线 */
+.note + .note {
+    border-top: 1px solid #262626;
+}
+
+/* 笔记标题：中等大小、略粗、古典感 */
+.note h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    margin: 0 0 0.5rem 0;
+    transition: color 0.25s ease;
+}
+
+/* 悬停整篇笔记时，标题泛起暗红 */
+.note:hover h2 {
+    color: #a85e5e;
+}
+
+/* 笔记标题链接：继承标题颜色，去掉下划线 */
+.note h2 a {
+    color: inherit;
+    border-bottom: none;
+    transition: color 0.25s ease;
+}
+
+/* 日期：等宽、距离标题很近 */
+.note .meta {
+    display: block;
+    margin-bottom: 1rem;
+    color: #6b665d;
+}
+
+/* 摘要：比正文更淡，退后一步 */
+.note .summary {
+    font-size: 1rem;
+    color: #a9a49b;
+    margin-bottom: 0;
+    max-width: 60ch;
+}
+
+/* 滚动条：极简暗色 */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0d0d0d;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #3a3a3a;
+}
