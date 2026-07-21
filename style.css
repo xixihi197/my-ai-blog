@@ -159,6 +159,44 @@ code,
     margin-left: 0.25em;
 }
 
+/* 文章目录：细边框索引卡片 */
+.toc {
+    margin: 2.5rem 0;
+    padding: 1.5rem 2rem;
+    border: 1px solid #262626;
+    border-radius: 2px;
+    font-size: 0.9375rem;
+}
+
+.toc h3 {
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+    color: #9e998f;
+    margin: 0 0 1rem 0;
+}
+
+.toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.toc li {
+    margin: 0.5rem 0;
+}
+
+.toc a,
+.toc a:visited {
+    color: #7f7a70;
+    border-bottom: none;
+    transition: color 0.25s ease;
+}
+
+.toc a:hover,
+.toc a:focus {
+    color: #a85e5e;
+}
+
 /* 分隔线：极细，刚好从背景中浮现 */
 hr,
 .divider {
@@ -236,6 +274,27 @@ a:focus {
     color: #a9a49b;
     margin-bottom: 0;
     max-width: 60ch;
+}
+
+/* 图片与图注 */
+figure {
+    margin: 2.5rem 0;
+}
+
+figure img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #262626;
+    border-radius: 2px;
+}
+
+figcaption {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: #7f7a70;
+    text-align: center;
+    font-style: italic;
 }
 
 /* 滚动条：极简暗色 */
