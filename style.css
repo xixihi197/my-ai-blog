@@ -14,14 +14,35 @@ html {
 body {
     min-height: 100vh;
     background-color: #0d0d0d;
-    /* 暗处的一束微光：从顶部中心向外弥散的径向渐变 */
-    background-image: radial-gradient(ellipse 80% 50% at 50% 0%, #1a1a1a 0%, #0d0d0d 60%);
-    background-attachment: fixed;
+    /* 顶层冷色微光 + 极低调网格线 */
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% 0%, #1c2020 0%, #0d0d0d 70%),
+        linear-gradient(to right, #151515 1px, transparent 1px),
+        linear-gradient(to bottom, #151515 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px;
+    background-position: 0 0, 0 0, 0 0;
+    background-attachment: fixed, fixed, fixed;
     color: #e8e4dc;
     font-family: "Noto Serif SC", Georgia, "Songti SC", "STSong", serif;
     line-height: 1.8;
     letter-spacing: 0.02em;
     padding: 10vh 6vw;
+}
+
+/* 扫描线纹理：极淡的老式屏幕感，铺在最上层 */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.015) 0,
+        rgba(255, 255, 255, 0.015) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+    z-index: 1;
 }
 
 /* 页面主体容器：居中、限宽、大量留白 */
@@ -32,11 +53,29 @@ main {
 
 /* 顶部导航：等宽、小字、疏朗、低调 */
 .site-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
     font-family: "SFMono-Regular", "Menlo", "Consolas", "Noto Sans SC", monospace;
     font-size: 0.8125rem;
     letter-spacing: 0.12em;
     color: #4a4742;
     margin-bottom: 3rem;
+}
+
+.site-nav::after {
+    content: "SYS.STATUS · ACTIVE";
+    color: #3a3a3a;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+/* 小屏幕上隐藏装饰性状态文字，避免挤压导航 */
+@media (max-width: 520px) {
+    .site-nav::after {
+        display: none;
+    }
 }
 
 .site-nav a,
@@ -63,6 +102,10 @@ h1 {
     font-size: 3.5rem;
     letter-spacing: 0.08em;
     margin-bottom: 0.75rem;
+    /* 克制的数字错位：红/青微偏移 */
+    text-shadow:
+        -1px 0 #7a3b3b,
+        1px 0 #2a4a4a;
 }
 
 h2 {
@@ -102,6 +145,18 @@ code,
     font-size: 0.8125rem;
     color: #7f7a70;
     letter-spacing: 0.04em;
+}
+
+/* 分类标签：细边框小徽章 */
+.tag {
+    display: inline-block;
+    padding: 0.15em 0.5em;
+    border: 1px solid #4a4742;
+    border-radius: 3px;
+    color: #9e998f;
+    font-size: 0.75rem;
+    vertical-align: middle;
+    margin-left: 0.25em;
 }
 
 /* 分隔线：极细，刚好从背景中浮现 */
