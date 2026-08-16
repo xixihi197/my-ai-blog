@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网站搭建流程图 · 研习录</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* 流程图专用样式 */
+        .flow-intro {
+            margin-bottom: 3rem;
+        }
+
+        .flow-chart {
+            position: relative;
+            margin: 3rem 0;
+        }
+
+        .flow-step {
+            display: grid;
+            grid-template-columns: 64px 1fr;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .flow-step:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 左侧时间线列 */
+        .step-marker {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid #a85e5e;
+            color: #a85e5e;
+            font-family: "SFMono-Regular", "Menlo", "Consolas", "Noto Sans SC", monospace;
+            font-size: 1.125rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background-color: #0d0d0d;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .flow-step:hover .step-number {
+            background-color: #a85e5e;
+            color: #f0ece4;
+            box-shadow: 0 0 20px rgba(168, 94, 94, 0.25);
+        }
+
+        /* 连接线 */
+        .step-marker::after {
+            content: "";
+            position: absolute;
+            top: 48px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: calc(100% + 3rem);
+            background: linear-gradient(
+                to bottom,
+                #a85e5e 0%,
+                #7a3b3b 60%,
+                #262626 100%
+            );
+            z-index: 1;
+        }
+
+        .flow-step:last-child .step-marker::after {
+            display: none;
+        }
+
+        /* 内容卡片 */
+        .step-card {
+            border: 1px solid #262626;
+            border-radius: 2px;
+            padding: 1.75rem 2rem;
+            background-color: rgba(13, 13, 13, 0.6);
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .flow-step:hover .step-card {
+            border-color: #4a4742;
+            transform: translateX(4px);
+        }
+
+        .step-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .step-title {
+            font-size: 1.375rem;
+            margin: 0;
+            color: #f0ece4;
+        }
+
+        .step-date {
+            font-family: "SFMono-Regular", "Menlo", "Consolas", "Noto Sans SC", monospace;
+            font-size: 0.75rem;
+            color: #6b665d;
+            letter-spacing: 0.05em;
+        }
+
+        .step-desc {
+            color: #c8c3ba;
+            margin-bottom: 1rem;
+        }
+
+        .step-details {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .step-details li {
+            position: relative;
+            padding-left: 1.25rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9375rem;
+            color: #a9a49b;
+            line-height: 1.6;
+        }
+
+        .step-details li::before {
+            content: "›";
+            position: absolute;
+            left: 0;
+            color: #a85e5e;
+        }
+
+        .step-highlight {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 0.875rem;
+            background-color: rgba(168, 94, 94, 0.08);
+            border-left: 2px solid #a85e5e;
+            font-size: 0.875rem;
+            color: #c98a8a;
+        }
+
+        /* 小屏幕适配 */
+        @media (max-width: 520px) {
+            .flow-step {
+                grid-template-columns: 40px 1fr;
+                gap: 1rem;
+            }
+
+            .step-number {
+                width: 36px;
+                height: 36px;
+                font-size: 0.875rem;
+            }
+
+            .step-marker::after {
+                top: 36px;
+            }
+
+            .step-card {
+                padding: 1.25rem 1.5rem;
+            }
+
+            .step-title {
+                font-size: 1.125rem;
+            }
+        }
+
+        /* 顶部状态条 */
+        .flow-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border: 1px solid #262626;
+            border-radius: 2px;
+            margin-bottom: 3rem;
+            font-family: "SFMono-Regular", "Menlo", "Consolas", "Noto Sans SC", monospace;
+            font-size: 0.8125rem;
+        }
+
+        .status-label {
+            color: #7f7a70;
+        }
+
+        .status-value {
+            color: #a85e5e;
+        }
+
+        .status-value::before {
+            content: "●";
+            margin-right: 0.5em;
+            color: #7a3b3b;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <nav class="site-nav" aria-label="主导航">
+            <a href="../index.html">首页</a> · <a href="../categories.html">分类</a>
+        </nav>
+
+        <article class="note-full">
+            <h1>研习录网站搭建流程</h1>
+            <time class="meta" datetime="2026-07-21">2026-07-21</time> <span class="tag">项目记录</span>
+
+            <div class="flow-intro">
+                <p class="subtitle">从零到上线的六个关键步骤，以及每一步踩过的坑与收获。</p>
+            </div>
+
+            <div class="flow-status">
+                <span class="status-label">PROJECT · MY-AI-BLOG</span>
+                <span class="status-value">STATUS · ONLINE</span>
+            </div>
+
+            <section class="flow-chart" aria-label="搭建流程时间线">
+                <div class="flow-step">
+                    <div class="step-marker">
+                        <div class="step-number">01</div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-header">
+                            <h2 class="step-title">搭建开发环境</h2>
+                            <time class="step-date">START</time>
+                        </div>
+                        <p class="step-desc">安装编辑器、版本控制工具与 AI 编程助手，为后续开发做准备。</p>
+                        <ul class="step-details">
+                            <li>安装 VS Code 作为代码编辑器</li>
+                            <li>配置 Git 与 GitHub 账号</li>
+                            <li>安装 Claude Code（ npm 方式 + PowerShell 执行策略）</li>
+                            <li>接入 Kimi API，调试到 k2.7-code 模型跑通</li>
+                        </ul>
+                        <span class="step-highlight">踩坑：TLS 版本不支持、ECONNREFUSED、401 鉴权失败、模型名称格式错误</span>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-marker">
+                        <div class="step-number">02</div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-header">
+                            <h2 class="step-title">确定方向与设计语言</h2>
+                            <time class="step-date">DESIGN</time>
+                        </div>
+                        <p class="step-desc">从模糊的想法收敛到具体的网站定位与视觉风格。</p>
+                        <ul class="step-details">
+                            <li>定位为「博客 + 简单评论区」的研习记录</li>
+                            <li>不做复杂注册系统，先保持简单</li>
+                            <li>视觉方向：雕塑感与未来科技感结合</li>
+                            <li>网站取名「研习录」</li>
+                        </ul>
+                        <span class="step-highlight">产出：纯 HTML 骨架页面，确认内容逻辑后再叠加样式</span>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-marker">
+                        <div class="step-number">03</div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-header">
+                            <h2 class="step-title">搭建网站基础结构</h2>
+                            <time class="step-date">BUILD</time>
+                        </div>
+                        <p class="step-desc">用 HTML 搭骨架，用 CSS 做视觉，先结构后样式。</p>
+                        <ul class="step-details">
+                            <li>首页 index.html 与笔记详情页</li>
+                            <li>全局样式 style.css</li>
+                            <li>深色背景 + 衬线字体 + 暗红点缀色</li>
+                            <li>极细分隔线与克制留白</li>
+                        </ul>
+                        <span class="step-highlight">成果：CSS 样式完成后的暗色首页效果</span>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-marker">
+                        <div class="step-number">04</div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-header">
+                            <h2 class="step-title">发布上线</h2>
+                            <time class="step-date">DEPLOY</time>
+                        </div>
+                        <p class="step-desc">通过 Git 存档代码，用 GitHub Pages 获得公开网址。</p>
+                        <ul class="step-details">
+                            <li>git init / add / commit 存档</li>
+                            <li>git push 推送到 GitHub 仓库</li>
+                            <li>开启 GitHub Pages 服务</li>
+                            <li>获得正式公开网址</li>
+                        </ul>
+                        <span class="step-highlight">里程碑：网站第一次能被互联网上任何人访问</span>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-marker">
+                        <div class="step-number">05</div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-header">
+                            <h2 class="step-title">加入评论互动功能</h2>
+                            <time class="step-date">INTERACT</time>
+                        </div>
+                        <p class="step-desc">接入 Giscus，让老师能在笔记下直接留言点评。</p>
+                        <ul class="step-details">
+                            <li>使用 Giscus 评论插件</li>
+                            <li>基于 GitHub Discussions 存储评论</li>
+                            <li>访客用 GitHub 账号登录即可留言</li>
+                            <li>无需额外注册系统</li>
+                        </ul>
+                        <span class="step-highlight">踩坑：本地 file:/// 访问会被 giscus.app 拒绝，必须通过正式 https 网址测试</span>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-marker">
+                        <div class="step-number">06</div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-header">
+                            <h2 class="step-title">功能完善：笔记分类</h2>
+                            <time class="step-date">ORGANIZE</time>
+                        </div>
+                        <p class="step-desc">用标签归档笔记，简化导航，提升可查阅性。</p>
+                        <ul class="step-details">
+                            <li>每篇笔记添加分类标签</li>
+                            <li>新增 categories.html 分类归档页</li>
+                            <li>首页与详情页显示对应标签</li>
+                            <li>砍掉「关于」页面，精简导航栏</li>
+                        </ul>
+                        <span class="step-highlight">最终形态：带分类标签、可评论、可归档的研习录首页</span>
+                    </div>
+                </div>
+            </section>
+
+            <hr class="divider">
+
+            <h2>下一步</h2>
+            <p>把示例内容替换成真实学习笔记；评估是否升级为多人可发帖的内部交流平台。</p>
+        </article>
+
+        <hr class="divider">
+
+        <section class="comments">
+            <h2>交流讨论</h2>
+            <script src="https://giscus.app/client.js"
+                    data-repo="xixihi197/my-ai-blog"
+                    data-repo-id="R_kgDOTeGGIg"
+                    data-category="General"
+                    data-category-id="DIC_kwDOTeGGIs4DBlUb"
+                    data-mapping="pathname"
+                    data-strict="0"
+                    data-reactions-enabled="1"
+                    data-emit-metadata="0"
+                    data-input-position="bottom"
+                    data-theme="dark"
+                    data-lang="zh-CN"
+                    crossorigin="anonymous"
+                    async>
+            </script>
+        </section>
+
+        <p><a href="../index.html">返回首页</a></p>
+    </main>
+</body>
+</html>
