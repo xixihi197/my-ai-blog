@@ -4,7 +4,7 @@
   "description": "研习录 - AI learning notes blog with Vercel serverless submission API",
   "private": true,
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   },
   "dependencies": {
     "busboy": "^1.6.0"
