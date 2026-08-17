@@ -289,19 +289,19 @@ async function githubPut(path, contentBase64, message, sha) {
   return res.json();
 }
 
-function buildNoteHtml({ title, category, date, contentHtml }) {
+function buildNoteHtml({ title, category, date, contentHtml, siteUrl }) {
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${escapeHtml(title)} · 研习录</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="${siteUrl}/style.css">
 </head>
 <body>
     <main>
         <nav class="site-nav" aria-label="主导航">
-            <a href="../index.html">首页</a> · <a href="../categories.html">分类</a> · <a href="../pages/submit.html">投稿</a>
+            <a href="${siteUrl}/index.html">首页</a> · <a href="${siteUrl}/categories.html">分类</a> · <a href="${siteUrl}/pages/submit.html">投稿</a>
         </nav>
 
         <article class="note-full">
@@ -332,7 +332,7 @@ ${contentHtml}
             </script>
         </section>
 
-        <p><a href="../index.html">返回首页</a></p>
+        <p><a href="${siteUrl}/index.html">返回首页</a></p>
     </main>
 </body>
 </html>`;
@@ -504,7 +504,7 @@ module.exports = async function handler(req, res) {
     }
 
     const contentHtml = mdToHtml(processedContent);
-    const noteHtml = buildNoteHtml({ title, category, date, contentHtml });
+    const noteHtml = buildNoteHtml({ title, category, date, contentHtml, siteUrl: SITE_URL });
     await githubPut(`notes/${slug}.html`, Buffer.from(noteHtml, 'utf-8').toString('base64'), `投稿笔记：${title}`);
 
     const indexFile = await githubGet('index.html');
