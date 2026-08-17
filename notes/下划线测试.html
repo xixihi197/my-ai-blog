@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -42,6 +42,25 @@
         </section>
 
         <p><a href="https://xixihi197.github.io/my-ai-blog/index.html">返回首页</a></p>
-    </main>
+    </main>    <script>
+        (function () {
+            const overlay = document.createElement('div');
+            overlay.className = 'lightbox-overlay';
+            const img = document.createElement('img');
+            overlay.appendChild(img);
+            document.body.appendChild(overlay);
+
+            overlay.addEventListener('click', function () {
+                overlay.classList.remove('active');
+            });
+
+            document.querySelectorAll('.note-full img').forEach(function (el) {
+                el.addEventListener('click', function () {
+                    img.src = el.src;
+                    overlay.classList.add('active');
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

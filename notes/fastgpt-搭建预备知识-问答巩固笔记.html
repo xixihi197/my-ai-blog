@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -219,6 +219,25 @@
             <a href="https://xixihi197.github.io/my-ai-blog/pages/delete.html?slug=fastgpt-%E6%90%AD%E5%BB%BA%E9%A2%84%E5%A4%87%E7%9F%A5%E8%AF%86-%E9%97%AE%E7%AD%94%E5%B7%A9%E5%9B%BA%E7%AC%94%E8%AE%B0&token=c07bcebd272bb11cca94ec1be5ba01dddb1a93999db1a0a54ac359747faacfc8">删除笔记</a> ·
             <a href="https://xixihi197.github.io/my-ai-blog/index.html">返回首页</a>
         </p>
-    </main>
+    </main>    <script>
+        (function () {
+            const overlay = document.createElement('div');
+            overlay.className = 'lightbox-overlay';
+            const img = document.createElement('img');
+            overlay.appendChild(img);
+            document.body.appendChild(overlay);
+
+            overlay.addEventListener('click', function () {
+                overlay.classList.remove('active');
+            });
+
+            document.querySelectorAll('.note-full img').forEach(function (el) {
+                el.addEventListener('click', function () {
+                    img.src = el.src;
+                    overlay.classList.add('active');
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

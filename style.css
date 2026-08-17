@@ -572,6 +572,47 @@ figure:hover img {
     filter: contrast(1.1) saturate(1.05);
 }
 
+/* 笔记正文图片：默认限制宽度，点击放大 */
+.note-full img {
+    max-width: 100%;
+    height: auto;
+    cursor: zoom-in;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    display: block;
+    margin: 1rem 0;
+    transition: filter 0.25s ease;
+}
+
+.note-full img:hover {
+    filter: brightness(1.05);
+}
+
+.lightbox-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(8, 10, 11, 0.92);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    cursor: zoom-out;
+    padding: 2rem;
+}
+
+.lightbox-overlay.active {
+    display: flex;
+}
+
+.lightbox-overlay img {
+    max-width: 95vw;
+    max-height: 95vh;
+    object-fit: contain;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    box-shadow: 0 0 60px rgba(0, 229, 255, 0.12);
+}
+
 figcaption {
     margin-top: 0.75rem;
     font-size: 0.875rem;
