@@ -138,6 +138,7 @@ Notes can be edited or deleted by anyone who has the note's edit token. The toke
 - When submitting through the form, use the original filename (basename) in Markdown image syntax; the backend replaces it with the actual stored path.
 - The frontend now validates that every local image referenced in Markdown has a matching uploaded file before submission.
 - The backend normalizes filenames with NFKC before matching, so full-width punctuation (e.g. `－`) and half-width punctuation (e.g. `-`) are treated as equivalent.
+- Uploaded filenames are parsed as UTF-8, so Chinese characters are preserved correctly.
 - Allowed image types: `image/jpeg`, `image/png`, `image/webp`.
 - Maximum 5 images per submission, each ≤ 2MB.
 
@@ -146,6 +147,10 @@ Notes can be edited or deleted by anyone who has the note's edit token. The toke
 GitHub Pages uses Jekyll by default, and Jekyll **ignores any file or directory whose name starts with an underscore `_`**. Screenshots uploaded from mobile devices often have names like `_20260812134452.png`, which means they are silently omitted from the published site and return 404.
 
 To prevent this, the repository root contains an empty `.nojekyll` file. **Do not remove it.** If it is ever deleted, images with underscore-prefixed filenames (and any other `_`-prefixed assets) will stop being served on GitHub Pages. Vercel deployments are not affected by Jekyll, so the same images will still load on the Vercel URL.
+
+### Image display
+
+Images inside note pages are constrained to the page width by default (`max-width: 100%`). Clicking an image opens a full-screen lightbox overlay so readers can view the original size without leaving the page.
 
 ## Notes on file naming
 
