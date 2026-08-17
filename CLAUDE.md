@@ -24,6 +24,11 @@ There is no build system, no JavaScript bundler, and no test suite.
 - `notes/` — individual note pages.
 - `images/` — screenshots and figures referenced by notes, organized as `images/<slug>/<filename>`.
 - `api/submit.js` — Vercel Serverless Function that receives submissions and writes files to GitHub.
+- `api/edit.js` — edits an existing note given the correct edit token.
+- `api/delete.js` — deletes a note and its assets given the correct edit token.
+- `lib/utils.js` — shared helpers used by the serverless functions.
+- `data/tokens.json` — maps note slugs to edit tokens (do not expose unnecessarily).
+- `data/notes/<slug>.json` — note metadata (title, category, author, summary, content, date, images) used by the edit flow.
 - `package.json` / `package-lock.json` — Node dependencies for the Vercel function (`busboy`).
 
 ## How to add a new note
@@ -116,6 +121,15 @@ The serverless function requires these Vercel project environment variables:
 - `GITHUB_TOKEN` — GitHub personal access token with `repo` or `contents:write` permission for `xixihi197/my-ai-blog`.
 - `SITE_URL` (optional) — public site URL used in generated notes and submission response. Defaults to `https://xixihi197.github.io/my-ai-blog`.
 - `GITHUB_REPO` / `GITHUB_BRANCH` (optional) — override the target repository or branch. Defaults to `xixihi197/my-ai-blog` and `main`.
+
+## Editing and deleting notes
+
+Notes can be edited or deleted by anyone who has the note's edit token. The token is generated when a note is submitted and stored in `data/tokens.json`.
+
+- Each generated note page includes **编辑笔记** and **删除笔记** links at the bottom, which carry the `slug` and `token` query parameters.
+- `pages/edit.html` loads the existing note metadata from `api/edit.js` (GET) and submits changes via JSON (POST).
+- `pages/delete.html` asks for confirmation and then calls `api/delete.js` to remove the note HTML, its metadata, its image directory, and its entries in `index.html` and `categories.html`.
+- **Security model**: the edit token is a weak secret. Keep the edit/delete links private; anyone with the link can modify or remove the note.
 
 ## Image handling
 

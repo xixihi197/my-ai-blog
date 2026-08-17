@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>删除笔记 · 研习录</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .delete-panel {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            border: 1px solid #5a2a2a;
+            border-radius: 2px;
+            background-color: #140c0c;
+        }
+
+        .delete-panel p {
+            margin-bottom: 1rem;
+            color: #d5a8a8;
+        }
+
+        .delete-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .delete-actions button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 2px;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.25s ease;
+        }
+
+        #confirmDelete {
+            background-color: #8b3a3a;
+            color: #f0ece4;
+        }
+
+        #confirmDelete:hover,
+        #confirmDelete:focus {
+            background-color: #a85e5e;
+        }
+
+        #confirmDelete:disabled {
+            background-color: #4a3a3a;
+            cursor: not-allowed;
+        }
+
+        #cancelDelete {
+            background-color: transparent;
+            border: 1px solid #2a3033;
+            color: #9e998f;
+        }
+
+        #cancelDelete:hover {
+            border-color: #00e5ff;
+            color: #00e5ff;
+        }
+
+        .result {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 2px;
+            border: 1px solid;
+            font-size: 0.9375rem;
+        }
+
+        .result.success {
+            display: block;
+            border-color: #2a4a3a;
+            background-color: #0f1f17;
+            color: #a8d5ba;
+        }
+
+        .result.error {
+            display: block;
+            border-color: #5a2a2a;
+            background-color: #1f1212;
+            color: #d5a8a8;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 0.875rem;
+            height: 0.875rem;
+            margin-right: 0.5rem;
+            border: 2px solid rgba(240, 236, 228, 0.3);
+            border-top-color: #f0ece4;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <nav class="site-nav" aria-label="主导航">
+            <a href="../index.html">首页</a> · <a href="../categories.html">分类</a> · <a href="./submit.html">投稿</a>
+        </nav>
+
+        <h1>删除笔记</h1>
+        <p class="subtitle">此操作不可恢复，请谨慎操作</p>
+
+        <div id="deletePanel" class="delete-panel">
+            <p>你确定要删除这篇笔记吗？笔记文件、图片和相关索引都会被永久移除。</p>
+            <p id="targetSlug" style="color: #9e998f; font-size: 0.875rem;"></p>
+
+            <div class="delete-actions">
+                <button type="button" id="confirmDelete">确认删除</button>
+                <button type="button" id="cancelDelete">取消</button>
+            </div>
+        </div>
+
+        <div id="result" class="result"></div>
+    </main>
+
+    <script>
+        (function () {
+            const API_URL = 'https://my-ai-blog-psi.vercel.app/api/delete';
+            const params = new URLSearchParams(window.location.search);
+            const slug = params.get('slug');
+            const token = params.get('token');
+
+            const deletePanel = document.getElementById('deletePanel');
+            const targetSlug = document.getElementById('targetSlug');
+            const confirmBtn = document.getElementById('confirmDelete');
+            const cancelBtn = document.getElementById('cancelDelete');
+            const result = document.getElementById('result');
+
+            if (!slug || !token) {
+                deletePanel.style.display = 'none';
+                showResult('error', '<p>链接缺少 slug 或 token，无法删除。</p>');
+                return;
+            }
+
+            targetSlug.textContent = '目标笔记：' + slug;
+
+            function showResult(type, html) {
+                result.className = 'result ' + type;
+                result.innerHTML = html;
+                result.style.display = 'block';
+                result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            cancelBtn.addEventListener('click', function () {
+                window.location.href = '../index.html';
+            });
+
+            confirmBtn.addEventListener('click', function () {
+                result.style.display = 'none';
+                confirmBtn.disabled = true;
+                confirmBtn.innerHTML = '<span class="spinner"></span>删除中…';
+
+                fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ slug: slug, token: token }),
+                })
+                    .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+                    .then(function (res) {
+                        confirmBtn.disabled = false;
+                        confirmBtn.textContent = '确认删除';
+
+                        if (res.ok && res.data.success) {
+                            deletePanel.style.display = 'none';
+                            showResult(
+                                'success',
+                                '<p>✅ 笔记已删除。</p>' +
+                                '<p><a href="../index.html">返回首页</a></p>'
+                            );
+                        } else {
+                            showResult('error', '<p>删除失败：' + (res.data.message || '未知错误') + '</p>');
+                        }
+                    })
+                    .catch(function (err) {
+                        confirmBtn.disabled = false;
+                        confirmBtn.textContent = '确认删除';
+                        showResult('error', '<p>网络错误：' + err.message + '</p>');
+                    });
+            });
+        })();
+    </script>
+</body>
+</html>

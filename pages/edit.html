@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑笔记 · 研习录</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .edit-form {
+            margin-top: 3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #9e998f;
+            font-size: 0.9375rem;
+            letter-spacing: 0.04em;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            background-color: #141414;
+            border: 1px solid #262626;
+            border-radius: 2px;
+            color: #e8e4dc;
+            padding: 0.75rem;
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.6;
+            transition: border-color 0.25s ease;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a4742;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        #content {
+            min-height: 320px;
+            font-family: "SFMono-Regular", "Menlo", "Consolas", "Noto Sans SC", monospace;
+            font-size: 0.9375rem;
+        }
+
+        .hint {
+            margin-top: 0.375rem;
+            font-size: 0.8125rem;
+            color: #6b665d;
+        }
+
+        .error {
+            display: none;
+            margin-top: 0.375rem;
+            font-size: 0.875rem;
+            color: #a85e5e;
+        }
+
+        button[type="submit"] {
+            background-color: #a85e5e;
+            color: #f0ece4;
+            border: none;
+            border-radius: 2px;
+            padding: 0.875rem 1.75rem;
+            font-family: inherit;
+            font-size: 1rem;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: background-color 0.25s ease;
+        }
+
+        button[type="submit"]:hover,
+        button[type="submit"]:focus {
+            background-color: #c98a8a;
+        }
+
+        button[type="submit"]:disabled {
+            background-color: #4a3a3a;
+            cursor: not-allowed;
+        }
+
+        .result {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 2px;
+            border: 1px solid;
+            font-size: 0.9375rem;
+        }
+
+        .result.success {
+            display: block;
+            border-color: #2a4a3a;
+            background-color: #0f1f17;
+            color: #a8d5ba;
+        }
+
+        .result.error {
+            display: block;
+            border-color: #5a2a2a;
+            background-color: #1f1212;
+            color: #d5a8a8;
+        }
+
+        .result a {
+            color: #00e5ff;
+            word-break: break-all;
+        }
+
+        .result-actions {
+            margin-top: 0.75rem;
+        }
+
+        .result-actions button {
+            background-color: transparent;
+            border: 1px solid #2a3033;
+            color: #9e998f;
+            padding: 0.375rem 0.75rem;
+            border-radius: 2px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8125rem;
+            transition: border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .result-actions button:hover {
+            border-color: #00e5ff;
+            color: #00e5ff;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 0.875rem;
+            height: 0.875rem;
+            margin-right: 0.5rem;
+            border: 2px solid rgba(240, 236, 228, 0.3);
+            border-top-color: #f0ece4;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading {
+            color: #9e998f;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <nav class="site-nav" aria-label="主导航">
+            <a href="../index.html">首页</a> · <a href="../categories.html">分类</a> · <a href="./submit.html">投稿</a>
+        </nav>
+
+        <h1>编辑笔记</h1>
+        <p class="subtitle">修改已有笔记的内容</p>
+
+        <p id="loading" class="loading">正在加载笔记内容…</p>
+
+        <form id="editForm" class="edit-form" style="display: none;">
+            <div class="form-group">
+                <label for="title">标题</label>
+                <input type="text" id="title" name="title" required maxlength="120" placeholder="文章标题">
+                <span class="error" id="titleError">请输入标题</span>
+            </div>
+
+            <div class="form-group">
+                <label for="category">分类</label>
+                <input type="text" id="category" name="category" required maxlength="40" placeholder="例如：基础概念 / 实战技巧">
+                <span class="error" id="categoryError">请输入分类</span>
+            </div>
+
+            <div class="form-group">
+                <label for="author">作者昵称</label>
+                <input type="text" id="author" name="author" required maxlength="40" placeholder="你的昵称">
+                <span class="error" id="authorError">请输入作者昵称</span>
+            </div>
+
+            <div class="form-group">
+                <label for="summary">摘要</label>
+                <textarea id="summary" name="summary" required maxlength="300" rows="3" placeholder="用一两句话概括文章要点"></textarea>
+                <span class="error" id="summaryError">请输入摘要</span>
+            </div>
+
+            <div class="form-group">
+                <label for="content">正文（Markdown）</label>
+                <textarea id="content" name="content" required rows="16" placeholder="在此输入 Markdown 正文..."></textarea>
+                <span class="error" id="contentError">请输入正文</span>
+                <p class="hint">编辑时暂不支持更换图片，原有图片引用会保持不变。</p>
+            </div>
+
+            <button type="submit" id="submitButton">保存修改</button>
+        </form>
+
+        <div id="result" class="result"></div>
+    </main>
+
+    <script>
+        (function () {
+            const API_URL = 'https://my-ai-blog-psi.vercel.app/api/edit';
+            const params = new URLSearchParams(window.location.search);
+            const slug = params.get('slug');
+            const token = params.get('token');
+
+            const form = document.getElementById('editForm');
+            const loading = document.getElementById('loading');
+            const submitButton = document.getElementById('submitButton');
+            const result = document.getElementById('result');
+
+            if (!slug || !token) {
+                loading.style.display = 'none';
+                showResult('error', '<p>链接缺少 slug 或 token，无法编辑。</p>');
+                return;
+            }
+
+            function setError(id, message) {
+                const el = document.getElementById(id);
+                if (message) {
+                    el.textContent = message;
+                    el.style.display = 'block';
+                } else {
+                    el.style.display = 'none';
+                }
+            }
+
+            function showResult(type, html, actionsHtml) {
+                result.className = 'result ' + type;
+                result.innerHTML = html + (actionsHtml || '');
+                result.style.display = 'block';
+                result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            function validate() {
+                let valid = true;
+                ['title', 'category', 'author', 'summary', 'content'].forEach(function (name) {
+                    const field = document.getElementById(name);
+                    if (!field.value.trim()) {
+                        setError(name + 'Error', '请填写此项');
+                        valid = false;
+                    } else {
+                        setError(name + 'Error', '');
+                    }
+                });
+                return valid;
+            }
+
+            fetch(API_URL + '?slug=' + encodeURIComponent(slug) + '&token=' + encodeURIComponent(token))
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    loading.style.display = 'none';
+                    if (!data.success) {
+                        showResult('error', '<p>加载失败：' + (data.message || '未知错误') + '</p>');
+                        return;
+                    }
+                    document.getElementById('title').value = data.title || '';
+                    document.getElementById('category').value = data.category || '';
+                    document.getElementById('author').value = data.author || '';
+                    document.getElementById('summary').value = data.summary || '';
+                    document.getElementById('content').value = data.content || '';
+                    form.style.display = 'block';
+                })
+                .catch(function (err) {
+                    loading.style.display = 'none';
+                    showResult('error', '<p>加载失败：' + err.message + '</p>');
+                });
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                result.style.display = 'none';
+
+                if (!validate()) {
+                    return;
+                }
+
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner"></span>保存中…';
+
+                const body = {
+                    title: document.getElementById('title').value.trim(),
+                    category: document.getElementById('category').value.trim(),
+                    author: document.getElementById('author').value.trim(),
+                    summary: document.getElementById('summary').value.trim(),
+                    content: document.getElementById('content').value.trim(),
+                };
+
+                fetch(API_URL + '?slug=' + encodeURIComponent(slug) + '&token=' + encodeURIComponent(token), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                })
+                    .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+                    .then(function (res) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = '保存修改';
+
+                        if (res.ok && res.data.success) {
+                            const url = res.data.url;
+                            showResult(
+                                'success',
+                                '<p>✅ 修改已保存。</p>' +
+                                '<p><a href="' + url + '" target="_blank">' + url + '</a></p>',
+                                '<div class="result-actions">' +
+                                '<button type="button" id="copyLink">复制链接</button>' +
+                                '<button type="button" id="viewNote">打开笔记</button>' +
+                                '</div>'
+                            );
+
+                            document.getElementById('copyLink').addEventListener('click', function () {
+                                navigator.clipboard.writeText(url).then(function () {
+                                    document.getElementById('copyLink').textContent = '已复制';
+                                    setTimeout(function () {
+                                        document.getElementById('copyLink').textContent = '复制链接';
+                                    }, 2000);
+                                });
+                            });
+
+                            document.getElementById('viewNote').addEventListener('click', function () {
+                                window.open(url, '_blank');
+                            });
+                        } else {
+                            showResult('error', '<p>保存失败：' + (res.data.message || '未知错误') + '</p>');
+                        }
+                    })
+                    .catch(function (err) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = '保存修改';
+                        showResult('error', '<p>网络错误：' + err.message + '</p>');
+                    });
+            });
+        })();
+    </script>
+</body>
+</html>

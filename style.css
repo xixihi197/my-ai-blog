@@ -377,6 +377,22 @@ hr::after,
     box-shadow: 0 0 8px var(--cyan-glow);
 }
 
+/* 笔记底部操作链接 */
+.note-actions {
+    margin-top: 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--text-dim);
+}
+
+.note-actions a {
+    margin: 0 0.25rem;
+}
+
+.note-actions a:first-child {
+    margin-left: 0;
+}
+
 /* 强调与链接 */
 a {
     color: var(--cyan);
