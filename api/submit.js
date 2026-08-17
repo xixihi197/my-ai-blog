@@ -133,14 +133,24 @@ function mdToHtml(md) {
   };
 
   const inlineToHtml = (text) => {
-    return escapeHtml(text)
-      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2">')
+    const placeholders = [];
+    let processed = escapeHtml(text)
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+        const placeholder = `\0IMG${placeholders.length}\0`;
+        placeholders.push(`<img alt="${escapeHtml(alt)}" src="${escapeHtml(src)}">`);
+        return placeholder;
+      })
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
       .replace(/`([^`]+)`/g, '<code>$1</code>')
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
       .replace(/__([^_]+)__/g, '<strong>$1</strong>')
       .replace(/\*([^*]+)\*/g, '<em>$1</em>')
       .replace(/_([^_]+)_/g, '<em>$1</em>');
+
+    placeholders.forEach((img, i) => {
+      processed = processed.replace(`\0IMG${i}\0`, img);
+    });
+    return processed;
   };
 
   for (let i = 0; i < lines.length; i++) {
