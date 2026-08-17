@@ -1,4 +1,5 @@
 const Busboy = require('busboy');
+const path = require('path');
 
 const REPO = process.env.GITHUB_REPO || 'xixihi197/my-ai-blog';
 const TOKEN = process.env.GITHUB_TOKEN;
@@ -470,11 +471,11 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    // 上传图片，并建立文件名 → 实际路径映射
     const imageMap = {};
     const usedNames = new Set();
     for (const file of files) {
-      let safeName = ensureImageExtension(file.filename, file.mimeType)
+      const originalName = path.basename(file.filename).replace(/\\/g, '/');
+      let safeName = ensureImageExtension(originalName, file.mimeType)
         .replace(/[\\/:*?"<>|\x00-\x1f\x7f]/g, '')
         .trim();
       if (!safeName) safeName = 'image';
@@ -491,9 +492,9 @@ module.exports = async function handler(req, res) {
       }
       usedNames.add(safeName);
 
-      const path = `images/${slug}/${safeName}`;
-      imageMap[file.filename] = `../${path}`;
-      await githubPut(path, file.buffer.toString('base64'), `投稿图片：${file.filename}（${title}）`);
+      const imagePath = `images/${slug}/${safeName}`;
+      imageMap[originalName] = `../${imagePath}`;
+      await githubPut(imagePath, file.buffer.toString('base64'), `投稿图片：${originalName}（${title}）`);
     }
 
     // 将正文里的 ![alt](filename) 替换为上传后的实际路径，再渲染 Markdown
