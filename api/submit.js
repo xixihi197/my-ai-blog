@@ -67,6 +67,7 @@ function parseForm(req) {
     const bb = Busboy({
       headers: req.headers,
       limits: { files: MAX_FILES, fileSize: MAX_SIZE },
+      defParamCharset: 'utf8',
     });
 
     bb.on('file', (name, file, info) => {
