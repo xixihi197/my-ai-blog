@@ -473,6 +473,28 @@
                     }
                 }
 
+                const content = document.getElementById('content').value;
+                const referencedImages = [];
+                content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function (match, alt, src) {
+                    if (!/^https?:\/\//i.test(src)) {
+                        referencedImages.push(src.normalize('NFKC').split('/').pop().split('\\').pop());
+                    }
+                    return match;
+                });
+
+                if (referencedImages.length > 0) {
+                    const uploadedNames = selectedFiles.map(function (file) {
+                        return file.name.normalize('NFKC');
+                    });
+                    const missing = referencedImages.filter(function (name) {
+                        return uploadedNames.indexOf(name) === -1;
+                    });
+                    if (missing.length > 0) {
+                        setError('contentError', '以下图片在 Markdown 中有引用但未上传：' + missing.join('、') + '。请上传图片，或把引用改成网络图片地址。');
+                        valid = false;
+                    }
+                }
+
                 return valid;
             }
 
@@ -515,10 +537,18 @@
 
                         if (result.ok && result.data.success) {
                             const url = result.data.url;
+                            const warnings = result.data.warnings || [];
+                            let warningHtml = '';
+                            if (warnings.length > 0) {
+                                warningHtml = '<div style="margin-top: 0.75rem; padding: 0.75rem; border: 1px solid #5a4a2a; background-color: #1f1812; color: #d5c8a8; font-size: 0.875rem;">' +
+                                    warnings.map(function (w) { return '<p>⚠️ ' + w + '</p>'; }).join('') +
+                                    '</div>';
+                            }
                             showResult(
                                 'success',
                                 '<p>🎉 投稿成功！</p>' +
-                                '<p><a href="' + url + '" target="_blank">' + url + '</a></p>',
+                                '<p><a href="' + url + '" target="_blank">' + url + '</a></p>' +
+                                warningHtml,
                                 '<div class="result-actions">' +
                                 '<button type="button" id="copyLink">复制链接</button>' +
                                 '<button type="button" id="viewNote">打开笔记</button>' +

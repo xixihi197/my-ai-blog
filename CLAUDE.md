@@ -136,6 +136,8 @@ Notes can be edited or deleted by anyone who has the note's edit token. The toke
 - Image assets go in `images/<slug>/<filename>`.
 - Reference images from notes with `../images/<slug>/<filename>`.
 - When submitting through the form, use the original filename (basename) in Markdown image syntax; the backend replaces it with the actual stored path.
+- The frontend now validates that every local image referenced in Markdown has a matching uploaded file before submission.
+- The backend normalizes filenames with NFKC before matching, so full-width punctuation (e.g. `－`) and half-width punctuation (e.g. `-`) are treated as equivalent.
 - Allowed image types: `image/jpeg`, `image/png`, `image/webp`.
 - Maximum 5 images per submission, each ≤ 2MB.
 

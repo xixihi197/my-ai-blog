@@ -3,8 +3,9 @@ const path = require('path');
 const {
   TOKEN,
   SITE_URL,
-  escapeHtml,
   escapeRegExp,
+  resolveImagePaths,
+  listMissingImages,
   mdToHtml,
   formatDate,
   toSlug,
@@ -223,11 +224,8 @@ module.exports = async function handler(req, res) {
     }
 
     // 将正文里的 ![alt](filename) 替换为上传后的实际路径，再渲染 Markdown
-    let processedContent = content;
-    for (const [filename, url] of Object.entries(imageMap)) {
-      const regex = new RegExp(`!\\[([^\\]]*)\\]\\(${escapeRegExp(filename)}\\)`, 'g');
-      processedContent = processedContent.replace(regex, `![$1](${url})`);
-    }
+    const processedContent = resolveImagePaths(content, imageMap);
+    const missingImages = listMissingImages(content, imageMap);
 
     const contentHtml = mdToHtml(processedContent);
     const editToken = generateToken();
@@ -271,6 +269,9 @@ module.exports = async function handler(req, res) {
       editUrl: `${SITE_URL}/pages/edit.html?slug=${encodeURIComponent(slug)}&token=${editToken}`,
       slug,
       createdAt: date,
+      warnings: missingImages.length > 0
+        ? [`以下图片在 Markdown 中有引用但未上传，将无法正常显示：${missingImages.join('、')}`]
+        : undefined,
     });
   } catch (err) {
     console.error('Submit error:', err);

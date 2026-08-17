@@ -2,6 +2,7 @@ const {
   TOKEN,
   SITE_URL,
   mdToHtml,
+  resolveImagePaths,
   githubGet,
   githubPut,
   loadTokensJson,
@@ -143,7 +144,14 @@ module.exports = async function handler(req, res) {
       }
 
       const date = meta.date;
-      const contentHtml = mdToHtml(content);
+      const imageMap = {};
+      for (const imgPath of meta.images || []) {
+        const parts = imgPath.replace(/^\.\.\//, '').split('/');
+        const filename = parts.pop();
+        if (filename) imageMap[filename] = imgPath;
+      }
+      const processedContent = resolveImagePaths(content, imageMap);
+      const contentHtml = mdToHtml(processedContent);
       const noteHtml = buildNoteHtml({ title, category, date, contentHtml, siteUrl: SITE_URL, slug, editToken: token });
 
       const noteFile = await githubGet(`notes/${slug}.html`);
