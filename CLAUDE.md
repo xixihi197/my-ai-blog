@@ -119,6 +119,12 @@ The serverless function requires these Vercel project environment variables:
 - Allowed image types: `image/jpeg`, `image/png`, `image/webp`.
 - Maximum 5 images per submission, each ≤ 2MB.
 
+### GitHub Pages image pitfall
+
+GitHub Pages uses Jekyll by default, and Jekyll **ignores any file or directory whose name starts with an underscore `_`**. Screenshots uploaded from mobile devices often have names like `_20260812134452.png`, which means they are silently omitted from the published site and return 404.
+
+To prevent this, the repository root contains an empty `.nojekyll` file. **Do not remove it.** If it is ever deleted, images with underscore-prefixed filenames (and any other `_`-prefixed assets) will stop being served on GitHub Pages. Vercel deployments are not affected by Jekyll, so the same images will still load on the Vercel URL.
+
 ## Notes on file naming
 
 - Use `.html` extensions.
