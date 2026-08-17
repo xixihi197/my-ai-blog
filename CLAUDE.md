@@ -95,13 +95,19 @@ git push origin main
 
 ### Vercel (API only)
 
-The serverless function is deployed to Vercel. To deploy manually from the repository root:
+The serverless function is deployed to Vercel and the project is already connected to the GitHub repository. Pushing to `main` automatically triggers a new Vercel production deployment.
+
+To deploy manually from the repository root (rarely needed now):
 
 ```powershell
 vercel --prod
 ```
 
-To enable automatic Vercel deploys whenever `main` is pushed, link the Vercel project to this GitHub repository via the Vercel dashboard or `vercel git connect`.
+If the Git connection is ever lost, reconnect it with:
+
+```powershell
+vercel git connect https://github.com/xixihi197/my-ai-blog.git
+```
 
 ## Environment variables
 
