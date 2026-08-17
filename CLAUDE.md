@@ -8,10 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The site uses a hybrid architecture:
 
-- **Static frontend**: plain HTML files + a single shared CSS file.
-- **Submission backend**: a Vercel Serverless Function (`api/submit.js`) that writes new notes directly to this GitHub repository via the GitHub API.
+- **Static frontend**: plain HTML files + a single shared CSS file, hosted on **GitHub Pages** at `https://xixihi197.github.io/my-ai-blog/`.
+- **Submission backend**: a Vercel Serverless Function (`api/submit.js`) at `https://my-ai-blog-psi.vercel.app/api/submit` that writes new notes directly to this GitHub repository via the GitHub API.
 - **Comments**: Giscus, backed by GitHub Discussions.
-- **Hosting**: currently deployed on Vercel at `https://my-ai-blog-psi.vercel.app`, with the repository still connected to GitHub Pages (`https://xixihi197.github.io/my-ai-blog/`).
+- **Hosting**: static pages are served by GitHub Pages from the `main` branch; Vercel only runs the `/api/submit` endpoint.
 
 There is no build system, no JavaScript bundler, and no test suite.
 
@@ -19,7 +19,7 @@ There is no build system, no JavaScript bundler, and no test suite.
 
 - `index.html` — homepage listing all notes.
 - `categories.html` — archive grouped by category.
-- `pages/submit.html` — public submission form.
+- `pages/submit.html` — public submission form. Its `action` points to the full Vercel API URL.
 - `style.css` — global styles; every page links to it.
 - `notes/` — individual note pages.
 - `images/` — screenshots and figures referenced by notes, organized as `images/<slug>/<filename>`.
@@ -32,10 +32,11 @@ There is no build system, no JavaScript bundler, and no test suite.
 
 1. Open `pages/submit.html` on the live site.
 2. Fill in title, category, author, summary, and Markdown content.
-3. To include images, write Markdown image syntax in the content using the **original uploaded filename**:
+3. To include images, write Markdown image syntax in the content using the **original uploaded filename** (basename only):
    ```markdown
    ![截图说明](原始文件名.jpg)
    ```
+   The backend matches images by basename, so the exact path is not required.
 4. Select the matching image files (up to 5, each ≤ 2MB).
 5. Submit. The serverless function will create:
    - `notes/<slug>.html`
@@ -82,34 +83,39 @@ Important limitation: Giscus rejects `file:///` origins. Comments can only be te
 
 ## Deployment
 
-### Current Vercel deployment
+### GitHub Pages (static frontend)
 
-The site is deployed on Vercel. To deploy manually:
+The repository is configured for GitHub Pages from the `main` branch. Pushing to `origin main` updates the site at `https://xixihi197.github.io/my-ai-blog/`.
 
 ```powershell
-# From the repository root
+git add .
+git commit -m "<message>"
+git push origin main
+```
+
+### Vercel (API only)
+
+The serverless function is deployed to Vercel. To deploy manually from the repository root:
+
+```powershell
 vercel --prod
 ```
 
-To link the Vercel project to the GitHub repository for automatic deploys on push, use the Vercel dashboard or:
-
-```powershell
-vercel git connect
-```
-
-### GitHub Pages
-
-The repository is also configured for GitHub Pages from the `main` branch. Pushing to `origin main` updates the GitHub Pages site at `https://xixihi197.github.io/my-ai-blog/`.
+To enable automatic Vercel deploys whenever `main` is pushed, link the Vercel project to this GitHub repository via the Vercel dashboard or `vercel git connect`.
 
 ## Environment variables
 
-The serverless function requires `GITHUB_TOKEN` to be set in the Vercel project environment variables. The token needs `repo` or `contents:write` permission for `xixihi197/my-ai-blog`.
+The serverless function requires these Vercel project environment variables:
+
+- `GITHUB_TOKEN` — GitHub personal access token with `repo` or `contents:write` permission for `xixihi197/my-ai-blog`.
+- `SITE_URL` (optional) — public site URL used in generated notes and submission response. Defaults to `https://xixihi197.github.io/my-ai-blog`.
+- `GITHUB_REPO` / `GITHUB_BRANCH` (optional) — override the target repository or branch. Defaults to `xixihi197/my-ai-blog` and `main`.
 
 ## Image handling
 
 - Image assets go in `images/<slug>/<filename>`.
 - Reference images from notes with `../images/<slug>/<filename>`.
-- When submitting through the form, use the original filename in Markdown image syntax; the backend replaces it with the actual stored path.
+- When submitting through the form, use the original filename (basename) in Markdown image syntax; the backend replaces it with the actual stored path.
 - Allowed image types: `image/jpeg`, `image/png`, `image/webp`.
 - Maximum 5 images per submission, each ≤ 2MB.
 
