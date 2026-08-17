@@ -475,8 +475,8 @@ module.exports = async function handler(req, res) {
     const usedNames = new Set();
     for (const file of files) {
       let safeName = ensureImageExtension(file.filename, file.mimeType)
-        .replace(/[^a-zA-Z0-9一-龥._-]/g, '')
-        .toLowerCase();
+        .replace(/[\\/:*?"<>|\x00-\x1f\x7f]/g, '')
+        .trim();
       if (!safeName) safeName = 'image';
       if (usedNames.has(safeName)) {
         const base = safeName.replace(/\.[^.]+$/, '');
