@@ -23,7 +23,6 @@
         }
 
         .form-group input[type="text"],
-        .form-group input[type="file"],
         .form-group textarea {
             width: 100%;
             background-color: #141414;
@@ -38,7 +37,6 @@
         }
 
         .form-group input[type="text"]:focus,
-        .form-group input[type="file"]:focus,
         .form-group textarea:focus {
             outline: none;
             border-color: #4a4742;
@@ -61,11 +59,114 @@
             color: #6b665d;
         }
 
+        .hint code {
+            background-color: #1a1a1a;
+            padding: 0.125rem 0.375rem;
+            border-radius: 2px;
+            color: #9e998f;
+            font-family: "SFMono-Regular", "Menlo", "Consolas", "Noto Sans SC", monospace;
+        }
+
         .error {
             display: none;
             margin-top: 0.375rem;
             font-size: 0.875rem;
             color: #a85e5e;
+        }
+
+        .drop-zone {
+            position: relative;
+            border: 1.5px dashed #2a3033;
+            border-radius: 2px;
+            padding: 1.5rem;
+            text-align: center;
+            color: #9e998f;
+            background-color: #0f1112;
+            transition: border-color 0.25s ease, background-color 0.25s ease;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            border-color: #00e5ff;
+            background-color: #0a1a1c;
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .drop-zone-text {
+            pointer-events: none;
+            font-size: 0.9375rem;
+        }
+
+        .drop-zone-text strong {
+            color: #00e5ff;
+            font-weight: 600;
+        }
+
+        .preview-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border: 1px solid #2a3033;
+            border-radius: 2px;
+            overflow: hidden;
+            background-color: #141414;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-item .remove {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            line-height: 1.5rem;
+            text-align: center;
+            background-color: #8b3a3a;
+            color: #f0ece4;
+            border: none;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            opacity: 0.85;
+            transition: opacity 0.2s ease;
+        }
+
+        .preview-item .remove:hover {
+            opacity: 1;
+        }
+
+        .preview-item .filename {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 0.25rem;
+            font-size: 0.6875rem;
+            color: #e8e4dc;
+            background-color: rgba(0, 0, 0, 0.7);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         button[type="submit"] {
@@ -84,6 +185,76 @@
         button[type="submit"]:hover,
         button[type="submit"]:focus {
             background-color: #c98a8a;
+        }
+
+        button[type="submit"]:disabled {
+            background-color: #4a3a3a;
+            cursor: not-allowed;
+        }
+
+        .result {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 2px;
+            border: 1px solid;
+            font-size: 0.9375rem;
+        }
+
+        .result.success {
+            display: block;
+            border-color: #2a4a3a;
+            background-color: #0f1f17;
+            color: #a8d5ba;
+        }
+
+        .result.error {
+            display: block;
+            border-color: #5a2a2a;
+            background-color: #1f1212;
+            color: #d5a8a8;
+        }
+
+        .result a {
+            color: #00e5ff;
+            word-break: break-all;
+        }
+
+        .result-actions {
+            margin-top: 0.75rem;
+        }
+
+        .result-actions button {
+            background-color: transparent;
+            border: 1px solid #2a3033;
+            color: #9e998f;
+            padding: 0.375rem 0.75rem;
+            border-radius: 2px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8125rem;
+            transition: border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .result-actions button:hover {
+            border-color: #00e5ff;
+            color: #00e5ff;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 0.875rem;
+            height: 0.875rem;
+            margin-right: 0.5rem;
+            border: 2px solid rgba(240, 236, 228, 0.3);
+            border-top-color: #f0ece4;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -129,20 +300,38 @@
 
             <div class="form-group">
                 <label for="images">图片上传</label>
-                <input type="file" id="images" name="images" multiple accept="image/*">
-                <p class="hint">最多 5 张，每张不超过 2MB</p>
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" id="images" name="images" multiple accept="image/jpeg,image/png,image/webp">
+                    <p class="drop-zone-text">
+                        <strong>点击选择</strong> 或拖拽图片到此处<br>
+                        最多 5 张，每张不超过 2MB
+                    </p>
+                </div>
+                <p class="hint">在正文中引用图片：<code>![描述](原始文件名.jpg)</code>。系统会自动匹配文件名，不需要写路径。</p>
                 <span class="error" id="imagesError"></span>
+                <div class="preview-list" id="previewList"></div>
             </div>
 
-            <button type="submit">提交投稿</button>
+            <button type="submit" id="submitButton">提交投稿</button>
         </form>
+
+        <div id="result" class="result"></div>
     </main>
 
     <script>
         (function () {
             const form = document.getElementById('submitForm');
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('images');
+            const previewList = document.getElementById('previewList');
+            const submitButton = document.getElementById('submitButton');
+            const result = document.getElementById('result');
+
             const MAX_FILES = 5;
             const MAX_SIZE = 2 * 1024 * 1024;
+            const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+            let selectedFiles = [];
 
             function setError(id, message) {
                 const el = document.getElementById(id);
@@ -154,7 +343,109 @@
                 }
             }
 
-            form.addEventListener('submit', function (event) {
+            function formatSize(bytes) {
+                if (bytes < 1024) return bytes + ' B';
+                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+            }
+
+            function renderPreviews() {
+                previewList.innerHTML = '';
+                selectedFiles.forEach(function (file, index) {
+                    const item = document.createElement('div');
+                    item.className = 'preview-item';
+
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.alt = file.name;
+
+                    const remove = document.createElement('button');
+                    remove.type = 'button';
+                    remove.className = 'remove';
+                    remove.textContent = '×';
+                    remove.title = '移除';
+                    remove.addEventListener('click', function () {
+                        selectedFiles.splice(index, 1);
+                        renderPreviews();
+                    });
+
+                    const filename = document.createElement('div');
+                    filename.className = 'filename';
+                    filename.textContent = file.name + ' · ' + formatSize(file.size);
+
+                    item.appendChild(img);
+                    item.appendChild(remove);
+                    item.appendChild(filename);
+                    previewList.appendChild(item);
+                });
+
+                const dt = new DataTransfer();
+                selectedFiles.forEach(function (file) {
+                    dt.items.add(file);
+                });
+                fileInput.files = dt.files;
+            }
+
+            function handleFiles(files) {
+                const incoming = Array.prototype.slice.call(files).filter(function (file) {
+                    return ALLOWED_TYPES.includes(file.type);
+                });
+
+                if (incoming.length === 0) {
+                    setError('imagesError', '请选择 JPG、PNG 或 WebP 格式的图片');
+                    return false;
+                }
+
+                const combined = selectedFiles.concat(incoming);
+                if (combined.length > MAX_FILES) {
+                    setError('imagesError', '最多只能上传 ' + MAX_FILES + ' 张图片');
+                    return false;
+                }
+
+                const oversized = combined.find(function (file) {
+                    return file.size > MAX_SIZE;
+                });
+                if (oversized) {
+                    setError('imagesError', '图片大小不能超过 2MB：' + oversized.name);
+                    return false;
+                }
+
+                selectedFiles = combined;
+                setError('imagesError', '');
+                renderPreviews();
+                return true;
+            }
+
+            fileInput.addEventListener('change', function () {
+                if (handleFiles(fileInput.files)) {
+                    fileInput.value = '';
+                }
+            });
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function (eventName) {
+                dropZone.addEventListener(eventName, function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(function (eventName) {
+                dropZone.addEventListener(eventName, function () {
+                    dropZone.classList.add('drag-over');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(function (eventName) {
+                dropZone.addEventListener(eventName, function () {
+                    dropZone.classList.remove('drag-over');
+                }, false);
+            });
+
+            dropZone.addEventListener('drop', function (e) {
+                handleFiles(e.dataTransfer.files);
+            }, false);
+
+            function validate() {
                 let valid = true;
 
                 ['title', 'category', 'author', 'summary', 'content'].forEach(function (name) {
@@ -167,30 +458,99 @@
                     }
                 });
 
-                const files = document.getElementById('images').files;
-
-                if (files.length > MAX_FILES) {
+                if (selectedFiles.length > MAX_FILES) {
                     setError('imagesError', '最多只能上传 ' + MAX_FILES + ' 张图片');
                     valid = false;
                 } else {
-                    let oversized = false;
-                    for (let i = 0; i < files.length; i++) {
-                        if (files[i].size > MAX_SIZE) {
-                            oversized = true;
-                            break;
-                        }
-                    }
+                    const oversized = selectedFiles.find(function (file) {
+                        return file.size > MAX_SIZE;
+                    });
                     if (oversized) {
-                        setError('imagesError', '每张图片大小不能超过 2MB');
+                        setError('imagesError', '图片大小不能超过 2MB：' + oversized.name);
                         valid = false;
                     } else {
                         setError('imagesError', '');
                     }
                 }
 
-                if (!valid) {
-                    event.preventDefault();
+                return valid;
+            }
+
+            function showResult(type, html, actionsHtml) {
+                result.className = 'result ' + type;
+                result.innerHTML = html + (actionsHtml || '');
+                result.style.display = 'block';
+                result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                result.style.display = 'none';
+
+                if (!validate()) {
+                    return;
                 }
+
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner"></span>提交中…';
+
+                const formData = new FormData(form);
+                formData.delete('images');
+                selectedFiles.forEach(function (file) {
+                    formData.append('images', file);
+                });
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(function (res) {
+                        return res.json().then(function (data) {
+                            return { ok: res.ok, status: res.status, data: data };
+                        });
+                    })
+                    .then(function (result) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = '提交投稿';
+
+                        if (result.ok && result.data.success) {
+                            const url = result.data.url;
+                            showResult(
+                                'success',
+                                '<p>🎉 投稿成功！</p>' +
+                                '<p><a href="' + url + '" target="_blank">' + url + '</a></p>',
+                                '<div class="result-actions">' +
+                                '<button type="button" id="copyLink">复制链接</button>' +
+                                '<button type="button" id="viewNote">打开笔记</button>' +
+                                '</div>'
+                            );
+
+                            document.getElementById('copyLink').addEventListener('click', function () {
+                                navigator.clipboard.writeText(url).then(function () {
+                                    document.getElementById('copyLink').textContent = '已复制';
+                                    setTimeout(function () {
+                                        document.getElementById('copyLink').textContent = '复制链接';
+                                    }, 2000);
+                                });
+                            });
+
+                            document.getElementById('viewNote').addEventListener('click', function () {
+                                window.open(url, '_blank');
+                            });
+
+                            form.reset();
+                            selectedFiles = [];
+                            renderPreviews();
+                        } else {
+                            const message = result.data.message || '提交失败（HTTP ' + result.status + '）';
+                            showResult('error', '<p>投稿失败：' + message + '</p>');
+                        }
+                    })
+                    .catch(function (err) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = '提交投稿';
+                        showResult('error', '<p>网络错误，请检查连接后重试。</p><p>' + err.message + '</p>');
+                    });
             });
         })();
     </script>
